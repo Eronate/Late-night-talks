@@ -40,7 +40,7 @@ export default function UserBox({
             </div>
             <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
                 <div className="text-md text-slate-300">
-                {user.name}
+                {user.username}
                 </div>
                 <div className="w-full flex flex-row">
                     <div className="text-sm text-slate-400 max-w-[70%] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">

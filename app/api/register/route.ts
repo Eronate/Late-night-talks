@@ -3,22 +3,22 @@ import prisma from "@/app/libs/prismadb"
 const bcrypt = require('bcrypt')
 import * as z from 'zod'
 import { registerSchema } from "@/app/types/RegisterType";
+import { generateTag } from "@/app/utils/generateTag";
 export async function POST(req: Request) {
     const body = await req.json()
     const {
         email,
-        name,
+        username,
         password,
     } = body
 
-   
-    if(!email || !name || !password)
+    if(!email || !username || !password)
     {
         return NextResponse.json({ error: 'Not all fields were introduced' }, { status: 400 })
     }
 
     try {
-        registerSchema.parse({email, name, password})
+        registerSchema.parse({email, username, password})
     }
     catch(err) {
         return NextResponse.json({ error: 'Fields introduced do not meet the specified requirements'}, { status: 400 })
@@ -38,11 +38,11 @@ export async function POST(req: Request) {
         userCreated = await prisma.user.create({
             data: {
                 email,
-                name,
-                hashedPassword
+                username,
+                hashedPassword,
+                tag: generateTag()
             }
         })
-    
         return NextResponse.json(userCreated);
     }   
     catch(err)

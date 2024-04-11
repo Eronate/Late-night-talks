@@ -15,7 +15,8 @@ datasource db {
 
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String?
+  username String?
+  tag Int?
   email String? @unique
   emailVerified DateTime?
   image String?
@@ -36,7 +37,11 @@ model User {
   friendsRequest User[] @relation("friendsRequest", fields: [friendsRequestIds], references: [id])
   friendsRequestIds String[] @db.ObjectId
   friendsRequestRelation User[] @relation("friendsRequest", fields: [friendsRequestIds], references: [id])
-
+  
+  sentFriendRequestIds String[] @db.ObjectId
+  sentFriendRequest User[] @relation("sentFriendsRequest", fields: [sentFriendRequestIds], references: [id])
+  sentFriendRequestRelation User[] @relation("sentFriendsRequest", fields: [sentFriendRequestIds], references: [id])
+  
   accounts Account[]
   messages Message[]
 }

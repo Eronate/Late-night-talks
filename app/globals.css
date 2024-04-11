@@ -7,3 +7,11 @@ body,
 :root{
   height: 100%;
 }
+
+::-webkit-scrollbar {
+  width: 5px; /* Remove scrollbar space */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f171e;
+}

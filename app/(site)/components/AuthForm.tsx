@@ -47,7 +47,7 @@ export default function AuthForm() {
       } = useForm<FieldValues>(
         { 
             defaultValues: { 
-                name: '', 
+                username: '', 
                 email: '', 
                 password: '' 
             },
@@ -59,8 +59,6 @@ export default function AuthForm() {
             criteriaMode: 'all',
         }
     )
-    const email = watch('email')
-    const password = watch('password')
 
     const socialAction = (action: string) => {
         setIsLoading(true)
@@ -127,9 +125,9 @@ export default function AuthForm() {
             variant === 'REGISTER' &&
             <div className="flex flex-col mt-4 gap-1">
                 <div className="flex text-xs text-gray-700">
-                    Your name
+                    Your username
                 </div>
-                <Input key="name" errors={errors["name"] as FieldError} disabled={isLoading} label="name" register={register} required={true} placeholder="Enter your name" />
+                <Input key="username" errors={errors["username"] as FieldError} disabled={isLoading} label="username" register={register} required={true} placeholder="Enter your username" />
             </div>
             }
             

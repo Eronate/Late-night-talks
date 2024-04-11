@@ -8,7 +8,7 @@ export const registerSchema = z.object({
     .email({
         message: 'Please enter a valid email address'
     }),
-    name: z
+    username: z
     .string()
     .min(5, {
         message: 'Name should be at least 5 characters long.'
