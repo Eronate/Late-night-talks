@@ -17,6 +17,7 @@ import { createContext } from 'react'
 import toast from 'react-hot-toast'
 import Button from '../Button'
 import { FriendsOrRequestsContext } from '../UsersList'
+import useBearStore from '@/app/stores/bearStore'
 
 export const FriendsContext = createContext([null, (user: string) => {}] as [
   string | null,
@@ -28,8 +29,14 @@ export default function UtilityBox() {
   const [usersFiltered, setUsersFiltered] = useState<User[]>([])
   const [chosenUser, setChosenUser] = useState<string | null>(null)
   const [state, setState] = useContext(FriendsOrRequestsContext)
+  const {
+    incomingRequests,
+    sentRequests,
+    setIncomingRequests,
+    setSentRequests,
+  } = useBearStore()
+
   const session = useSession()
-  console.log(session)
 
   const InjectUsersIntoState = useCallback(
     async (search: string) => {
@@ -76,16 +83,17 @@ export default function UtilityBox() {
         .then((res) => {
           if (res.status === 200) {
             const usernameSentTo = res.data.username
+            setSentRequests([...(sentRequests || []), res.data] as User[])
             toast.success(`Friend request sent to ${usernameSentTo}!`)
           }
           if (res.status === 201) {
-            toast('You have already sent a friend request to this user')
+            toast(res.data.error || 'You cannot do that.')
           }
         })
         .catch((err: any) => {
           toast.error('Error in sending friend request')
         })
-  }, [chosenUser, session.data?.user.id])
+  }, [chosenUser, session.data?.user.id, setSentRequests, sentRequests])
 
   const AddFriendModal = useMemo(() => {
     return (
@@ -123,6 +131,8 @@ export default function UtilityBox() {
       </Dialog>
     )
   }, [chosenUser, search, sendFriendRequest, usersFiltered])
+
+  if (!session.data?.user) return <></>
 
   return (
     <div className="flex flex-col w-full p-2 ">

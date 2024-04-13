@@ -1,9 +1,10 @@
 'use client'
-import useOtherUsers from '@/app/hooks/useOtherUsers'
+import useFriends from '@/app/hooks/useFriends'
 import UserBox from './UserBox'
 import UtilityBox from './friends/UtilityBox'
 import { createContext, useState } from 'react'
 import Requests from './friends/Requests'
+import Self from './Self'
 
 type contextType = 'friends' | 'requests' | null
 export const FriendsOrRequestsContext = createContext<
@@ -15,17 +16,25 @@ export const FriendsOrRequestsContext = createContext<
 
 export default function UsersList() {
   const [state, setState] = useState<contextType>('friends')
-  const users = useOtherUsers()
-  if (!users) return <></>
+  const friends = useFriends()
+  console.log(friends)
+  if (!friends) return <></>
   return (
     <FriendsOrRequestsContext.Provider value={[state, setState]}>
-      <div className="flex min-w-full sm:min-w-96 h-full bg-navycustom flex-col">
+      <div className="flex min-w-full sm:min-w-96 bg-navycustom flex-col h-full">
         <UtilityBox />
         {state === 'requests' ? (
           <Requests />
         ) : (
-          users.map((u, index) => <UserBox key={index} user={u} />)
+          <div className="max-h-[60vh] sm:max-h-[90vh] overflow-y-auto border-b-violet-800 border-b-2 border-t-2 border-t-violet-800">
+            {(friends || []).map((u, index) => (
+              <UserBox key={index} user={u} />
+            ))}
+          </div>
         )}
+        <div className="flex max-h-max w-full mt-auto mb-10 sm:mb-0">
+          <Self />
+        </div>
       </div>
     </FriendsOrRequestsContext.Provider>
   )

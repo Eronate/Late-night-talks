@@ -1,3 +1,4 @@
+'use client'
 import { User } from '@prisma/client'
 import UserBox from '../UserBox'
 import { useContext, useMemo, useState } from 'react'
