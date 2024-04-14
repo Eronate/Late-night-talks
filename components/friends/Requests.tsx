@@ -53,12 +53,12 @@ export default function Requests() {
   )
 
   return (
-    <div className="flex p-3 flex-col">
+    <div className="flex p-3 flex-col overflow-y-auto">
       <div className="text-md text-slate-300 p-2 text-center">
         Incoming requests
       </div>
 
-      <div className="max-h-44 sm:max-h-52 overflow-y-auto">
+      <div className="flex-grow">
         {(incomingRequests || []).map((req, index) => {
           return (
             <FriendRequestBox
@@ -74,7 +74,7 @@ export default function Requests() {
       <div className="text-md text-slate-300 text-center p-2">
         Sent requests
       </div>
-      <div className="max-h-44 sm:max-h-52 overflow-y-auto">
+      <div className="flex-grow">
         {(sentRequests || []).map((req, index) => (
           <FriendRequestBox
             key={index}

@@ -7,12 +7,12 @@ export default function Self() {
   console.log('Self', self)
   if (!self) return <></>
   return (
-    <div className="w-full flex shadow-md bg-customcoolcolor border-maroonlight border-1 p-3 mt-1">
+    <div className="w-full flex shadow-md flex-shrink h-auto bg-customcoolcolor border-maroonlight border-1 p-3 mt-1">
       <div className="flex">
-        <div className="w-max relative h-max shadow-xl rounded-full">
+        <div className="w-max relative h-max shadow-xl rounded-full ">
           <img
             src={self.image || '/gengar.jpg'}
-            className="w-auto h-full max-h-28"
+            className="w-auto max-h-16 border-dotted border-2 shadow-lg border-black"
           />
           <div className="absolute top-0 right-0 w-2 h-2 bg-green-400 ring-navycustom ring-4 z-50 rounded-full" />
         </div>

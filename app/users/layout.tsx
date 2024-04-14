@@ -1,16 +1,11 @@
-import DesktopSidebar from "@/components/DesktopSidebar";
-import MobileFooter from "@/components/MobileFooter";
+import DesktopSidebar from '@/components/DesktopSidebar'
+import MobileFooter from '@/components/MobileFooter'
+import NavLayout from '@/components/NavLayout'
 
 export default async function Layout({
-    children
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    return (
-        <div className="w-full h-full overflow-visible flex">
-            <DesktopSidebar/>
-            <MobileFooter/>
-            {children}
-        </div>
-    )
+  return <NavLayout>{children}</NavLayout>
 }

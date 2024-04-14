@@ -8,6 +8,7 @@ import { useCallback } from 'react'
 import toast from 'react-hot-toast'
 import { IoClose } from 'react-icons/io5'
 import { TiTick } from 'react-icons/ti'
+import Avatar from './Avatar'
 
 export default function FriendRequestBox({
   user,
@@ -91,15 +92,7 @@ export default function FriendRequestBox({
 
   return (
     <div className={style}>
-      <div className="flex">
-        <div className="w-max relative h-max shadow-xl rounded-full">
-          <img
-            src={user.image || '/gengar.jpg'}
-            className="w-10 h-10 rounded-full"
-          />
-          <div className="absolute top-0 right-0 w-2 h-2 bg-green-400 ring-navycustom ring-4 z-50 rounded-full" />
-        </div>
-      </div>
+      <Avatar img={user.image} />
 
       <div className="flex ml-2 flex-row justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-400">{user.username}</div>

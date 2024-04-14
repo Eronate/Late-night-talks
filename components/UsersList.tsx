@@ -21,7 +21,7 @@ export default function UsersList() {
   if (!friends) return <></>
   return (
     <FriendsOrRequestsContext.Provider value={[state, setState]}>
-      <div className="flex min-w-full sm:min-w-96 bg-navycustom flex-col h-full">
+      <div className="flex min-w-full sm:min-w-96 bg-navycustom flex-col max-h-full">
         <UtilityBox />
         {state === 'requests' ? (
           <Requests />
@@ -32,7 +32,7 @@ export default function UsersList() {
             ))}
           </div>
         )}
-        <div className="flex max-h-max w-full mt-auto mb-10 sm:mb-0">
+        <div className="flex w-full mt-auto mb-10 sm:mb-0">
           <Self />
         </div>
       </div>

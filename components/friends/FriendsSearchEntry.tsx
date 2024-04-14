@@ -4,6 +4,7 @@ import UserBox from '../UserBox'
 import { useContext, useMemo, useState } from 'react'
 import clsx from 'clsx'
 import { FriendsContext } from './UtilityBox'
+import Avatar from '../Avatar'
 
 export default function FriendsSearchEntry({ user }: { user: User }) {
   const [chosenUser, setChosenUser] = useContext(FriendsContext)
@@ -32,15 +33,7 @@ export default function FriendsSearchEntry({ user }: { user: User }) {
   }
   return (
     <div onClick={handleClick} className={style}>
-      <div className="flex">
-        <div className="w-max relative h-max shadow-xl rounded-full">
-          <img
-            src={user.image || '/gengar.jpg'}
-            className="w-10 h-10 rounded-full"
-          />
-          <div className="absolute top-0 right-0 w-2 h-2 bg-green-400 ring-navycustom ring-4 z-50 rounded-full" />
-        </div>
-      </div>
+      <Avatar img={user.image} />
       <div className="flex ml-2 flex-col justify-center min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300">{user.username}</div>
       </div>
