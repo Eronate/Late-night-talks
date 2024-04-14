@@ -136,7 +136,7 @@ export default function UtilityBox() {
 
   return (
     <div className="flex flex-col w-full p-2 ">
-      <div className="text-2xl p-2 text-slate-400">Friends list</div>
+      <div className="text-xl text-slate-300 pb-2 text-center">Friends</div>
 
       <div className="flex flex-row justify-around">
         <Button

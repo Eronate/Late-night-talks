@@ -26,7 +26,7 @@ export default function UsersList() {
         {state === 'requests' ? (
           <Requests />
         ) : (
-          <div className="max-h-[60vh] sm:max-h-[90vh] overflow-y-auto border-b-violet-800 border-b-2 border-t-2 border-t-violet-800">
+          <div className="max-h-[60vh] sm:max-h-[90vh] overflow-y-auto shadow-lg">
             {(friends || []).map((u, index) => (
               <UserBox key={index} user={u} />
             ))}

@@ -5,7 +5,7 @@ import getCurrentUser from "./getCurrentUser"
 const getConversations = async () => {
     const currentUser = await getCurrentUser()
     if(!currentUser?.id)
-        return []
+        return null
 
     try{
         const conversations = await prismadb.conversation.findMany({
@@ -35,4 +35,4 @@ const getConversations = async () => {
     }           
 }
 
-export default getConversations
+export default getConversations;
