@@ -3,20 +3,23 @@ import { FullConversationType } from '@/app/types'
 import ConversationBody from '@/components/conversation/ConversationBody'
 import Header from '@/components/conversation/Header'
 import TypingInMessageForm from '@/components/conversation/TypingInMessageForm'
+import { useMemo } from 'react'
 
 export default async function ConversationWindow({
   params,
 }: {
-  params: { id: string }
+  params: { conversationId: string }
 }) {
-  const conversation = await getConversationByIdWithMessages(params.id)
+  const conversation = await getConversationByIdWithMessages(
+    params.conversationId
+  )
 
   if (!conversation) return <div>Loading...</div>
-
+  console.log('Conversation', { conversation })
   return (
-    <div>
-      <Header />
-      <ConversationBody />
+    <div className="w-full h-full bg-brownish4 p-1 flex-col flex">
+      <Header conversation={conversation} />
+      <ConversationBody conversation={conversation} />
       <TypingInMessageForm />
     </div>
   )

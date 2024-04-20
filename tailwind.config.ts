@@ -23,6 +23,10 @@ const config: Config = {
         'maroon2': '#720455',
         'purplecustom': '#910A67',
         'customcoolcolor': 'rgb(67,45,128)',
+        'brownish4': '#49243E',
+        'brownish3': '#704264',
+        'brownish2': '#BB8493',
+        'brownish': '#DBAFA0',
       }
     },
   },

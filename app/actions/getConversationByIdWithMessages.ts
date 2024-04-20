@@ -1,5 +1,6 @@
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "./getCurrentUser";
+import { FullConversationType } from "../types";
 
 const getConversationByIdWithMessages = async (
   id: string
@@ -23,7 +24,7 @@ const getConversationByIdWithMessages = async (
                 seen: true
             },
             orderBy: {
-                createdAt: 'desc'
+                createdAt: 'asc'
             }
         }
       }

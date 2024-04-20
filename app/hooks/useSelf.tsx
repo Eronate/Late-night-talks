@@ -9,14 +9,14 @@ export default function useSelf() {
   const [self, setSelf] = useState<User | null>(null)
   const session = useSession()
   const currentId = session.data?.user.id
-  console.log('currentId', currentId)
+  // console.log('currentId', currentId)
   useEffect(() => {
     if (!currentId) return
 
     const fetch = async () => {
       const response = await axios.get(`/api/user/?id=${currentId}`)
       const getSelf = response.data
-      console.log('response', response.data)
+      // console.log('response', response.data)
       setSelf(getSelf)
     }
     fetch()

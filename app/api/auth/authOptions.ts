@@ -90,6 +90,7 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.username = user.username;
         token.id = user.id;
+        token.image = user.image || '/gengar.jpg'
       }
       return token;
     },
@@ -98,7 +99,8 @@ export const authOptions: AuthOptions = {
         session.user.username = token.username;
       if(token.id)
         session.user.id = token.id;
-
+      if(token.image)
+        session.user.image = token.image
       return session;
     },
   }

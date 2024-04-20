@@ -7,7 +7,7 @@ export default async function RemoveBothRequests(req: Request) {
     {
         const body = await req.json()
         const { sender, receiver } = requestBodySchema.parse(body)
-        console.log({sender, receiver})
+        // console.log({sender, receiver})
         const senderSentFriendRequestResponse = await prismadb.user.findFirst({
             where: {
                 email: sender

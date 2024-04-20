@@ -4,6 +4,8 @@ import formatLastMessageTime from '@/lib/formatTime'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import clsx from 'clsx'
+import useOtherUserConversation from '@/app/hooks/useOtherUserConversation'
 
 export default function ConversationBox({
   conversation,
@@ -19,11 +21,15 @@ export default function ConversationBox({
     conversation?.lastMessageAt || conversation.createdAt
   )
   const [title, setTitle] = useState<string | null>()
-  const img = useMemo(() => conversation.users[0].image, [conversation.users])
-  const lastMessageBody = useMemo(
-    () => lastMessage?.body || 'Started a conversation',
-    [lastMessage?.body]
-  )
+
+  const otherUser = useOtherUserConversation(conversation)
+
+  const img = useMemo(() => otherUser?.image, [otherUser])
+
+  const lastMessageBody = useMemo(() => {
+    if (lastMessage?.image) return 'Sent an image'
+    else return lastMessage?.body || 'Started a conversation'
+  }, [lastMessage])
 
   useEffect(() => {
     if (!currUsername) return
@@ -35,6 +41,17 @@ export default function ConversationBox({
     })
   }, [setTitle, currUsername, conversation.users])
 
+  if (!session.data?.user.id) return <></>
+
+  const textStyle = clsx(
+    `
+    text-xs text-slate-400 max-w-[70%] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap
+  `,
+    !lastMessage?.seenIds.includes(session.data!.user.id)
+      ? 'font-semibold text-slate-200'
+      : ''
+  )
+
   return (
     <Link
       href={`/conversations/${conversation.id}`}
@@ -44,10 +61,8 @@ export default function ConversationBox({
       <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300">{title}</div>
         <div className="w-full flex flex-row">
-          <div className="text-sm text-slate-400 max-w-[70%] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
-            {lastMessageBody}
-          </div>
-          <div className="pl-3 flex ml-auto self-end text-sm text-slate-500">
+          <div className={textStyle}>{lastMessageBody}</div>
+          <div className="pl-3 flex ml-auto self-end text-xs text-slate-500">
             {formatLastMessageTime(lastMesageAt)}
           </div>
         </div>

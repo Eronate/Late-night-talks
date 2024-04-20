@@ -74,8 +74,8 @@ model Conversation {
   userIds String[] @db.ObjectId
   users User[] @relation(fields: [userIds], references: [id])
 
-  messageIds String[] @db.ObjectId
-  messages Message[] 
+  messageIds String[] @db.ObjectId 
+  messages Message[]
   @@index([userIds])
 }
 
@@ -89,7 +89,7 @@ model Message {
   seen User[] @relation("Seen", fields: [seenIds], references: [id])
 
   conversationId String @db.ObjectId
-  conversation Conversation @relation(fields: [conversationId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   senderId String @db.ObjectId
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)

@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     if(!sendFriendRequestToReceiver || !addRequestToPendingForSender)
         return Response.json({ error: 'Error in sending friend request' }, { status: 400 })
 
-    console.log("Friends request sent:", {sendFriendRequestToReceiver})
-    console.log("Friends request awaiting:", {addRequestToPendingForSender})
+    // console.log("Friends request sent:", {sendFriendRequestToReceiver})
+    // console.log("Friends request awaiting:", {addRequestToPendingForSender})
     return NextResponse.json(sendFriendRequestToReceiver)
 }   

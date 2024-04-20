@@ -15,7 +15,7 @@ export default function ConversationList({
   if (!conversations) return <div>Loading...</div>
 
   return (
-    <div className="flex flex-col bg-navycustom ">
+    <div className="sm:flex flex-col bg-navycustom hidden">
       <div className="text-xl text-slate-300 p-2 text-center">
         Conversations
       </div>
@@ -24,7 +24,7 @@ export default function ConversationList({
           <ConversationBox key={index} conversation={conversation} />
         ))}
       </div>
-      <div className="mt-auto">
+      <div className="mt-auto pb-12 sm:pb-0">
         <Self />
       </div>
     </div>

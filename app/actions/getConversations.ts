@@ -9,9 +9,9 @@ const getConversations = async () => {
 
     try{
         const conversations = await prismadb.conversation.findMany({
-            orderBy: {
-                lastMessageAt: 'desc'
-            },
+            // orderBy: {
+            //     lastMessageAt: 'desc'
+            // },
             where: {
                 userIds: {
                     has: currentUser.id
@@ -23,6 +23,9 @@ const getConversations = async () => {
                     include: {
                         sender: true,
                         seen: true
+                    },
+                    orderBy: {
+                        createdAt: 'asc'
                     }
                 }
             }
