@@ -25,6 +25,7 @@ export default function Button({
       'bg-customcoolcolor hover:bg-navylight hover:text-white',
     variant === 'selected' &&
       'bg-navylight hover:bg-customcoolcolor hover:text-white',
+    disabled === true && 'opacity-25',
     variant === 'danger' && 'bg-red-700 hover:bg-red-500 hover:text-white'
   )
   return (

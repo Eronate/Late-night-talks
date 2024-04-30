@@ -1,40 +1,20 @@
 import { prismadb } from "@/app/libs/prismadb";
+import { pusherServer } from "@/app/libs/pusher";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     const body = await req.json();
     const { input, image, conversationId, sender } = body;
-    console.log(input, conversationId, sender)
+
     if(!input && !image)
         return NextResponse.json("No input or image sent", { status: 400 });
     if (!conversationId || !sender) {
         return NextResponse.json("Not all fields sent", { status: 400 });
     }
     try{
-        let message
-        if(input)
-            message = await prismadb.message.create({
-                data: {
-                    body: input,
-                    sender: {
-                        connect: {
-                            id: sender
-                        }
-                    },
-                    conversation: {
-                        connect: {
-                            id: conversationId
-                        }
-                    },
-                    seen: {
-                        connect: {
-                            id: sender
-                        }
-                    },
-                }   
-            })
-        else message = await prismadb.message.create({
+        const message = await prismadb.message.create({
             data: {
+                body: input,
                 image: image,
                 sender: {
                     connect: {
@@ -51,8 +31,34 @@ export async function POST(req: Request) {
                         id: sender
                     }
                 },
+            },
+            include: {
+                seen: true,
+                sender: true,
             }   
         })
+        // else message = await prismadb.message.create({
+        //     data: {
+        //         image: image,
+        //         sender: {
+        //             connect: {
+        //                 id: sender
+        //             }
+        //         },
+        //         conversation: {
+        //             connect: {
+        //                 id: conversationId
+        //             }
+        //         },
+        //         seen: {
+        //             connect: {
+        //                 id: sender
+        //             }
+        //         },
+        //     }   
+        // })
+        
+        await pusherServer.trigger(`messages-${conversationId}`, 'new-message', message)
 
         const updatedConveersation = await prismadb.conversation.update({
             where: {

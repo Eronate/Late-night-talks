@@ -1,48 +1,58 @@
 import prisma from "@/app/libs/prismadb"
 import { NextResponse } from "next/server"
 
-//Expects the users' emails 
+//Expects the users' ids
 export async function POST(req: Request) {
     const body = await req.json()
-    //Only the emails were sent
-    console.log(body)
-    const { users } = body as {users: string[]}
-    if(!users)
-        return NextResponse.json({error: 'Users field not in request'}, {status: 400})
+
+    const { users, name, isGroup } = body as {users: string[], name: string, isGroup: boolean}
     
-    const usersArr = users.map(async (email: string) => {
-        const userId = await prisma.user.findUnique({
+    if(users.length < 2)
+        return NextResponse.json({error: 'Not enough users'}, {status: 400})
+
+    if(!isGroup)
+    {
+        const foundConversation = await prisma.conversation.findFirst({
             where: {
-                email: email
+                OR: [
+                    { userIds: { equals: [users[0], users[1]] } },
+                    { userIds: { equals: [users[1], users[0]] } }
+                ]
             }
-        })
-        if(!userId)
-            return null
-        return userId
-    })
-    const usersArrResolved = await Promise.all(usersArr)
+        });
 
-    if(usersArrResolved.includes(null))
-        return NextResponse.json({error: 'Not all users were found'}, {status: 400})
-   
-    const userIdsResolved = usersArrResolved.map(user => user!.id)
+        if(foundConversation)
+            return NextResponse.json(foundConversation)
 
-
-    const conversationQuery = await prisma.conversation.findFirst({
-        where: {
-            userIds: {
-                hasEvery: userIdsResolved,
-            },
-        },
-    })
-    if(conversationQuery)
-        return NextResponse.json(conversationQuery)
+        else
+        {
+            try{
+                const conversationCreated = await prisma.conversation.create({
+                    data: {
+                        userIds: users,
+                        isGroup: false,
+                        name: name
+                    },
+                    include: {
+                        users: true
+                    }
+                })
+                return NextResponse.json(conversationCreated)
+            }
+            catch(err)
+            {
+                console.log(err)
+                return NextResponse.json({error: 'Could not be created'}, {status: 400})
+            }
+        }
+    }
 
     try{
         const conversationCreated = await prisma.conversation.create({
             data: {
-                userIds: userIdsResolved,
-                isGroup: userIdsResolved.length > 2
+                userIds: users,
+                isGroup: true,
+                name: name
             },
             include: {
                 users: true

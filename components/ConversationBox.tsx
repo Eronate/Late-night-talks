@@ -5,7 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import clsx from 'clsx'
-import useOtherUserConversation from '@/app/hooks/useOtherUserConversation'
+import useOtherUserConversation, {
+  useOtherUsersConversation,
+} from '@/app/hooks/useOtherUserConversation'
+import AvatarGroup from './conversation/AvatarGroup'
+import { User } from '@prisma/client'
 
 export default function ConversationBox({
   conversation,
@@ -14,6 +18,7 @@ export default function ConversationBox({
 }) {
   const session = useSession()
   const currUsername = session?.data?.user.username
+  const currId = session?.data?.user.id
   const [lastMessage, setLastMesasge] = useState(
     conversation?.messages[conversation.messages.length - 1] || null
   )
@@ -31,15 +36,16 @@ export default function ConversationBox({
     else return lastMessage?.body || 'Started a conversation'
   }, [lastMessage])
 
+  const otherUsers: User[] | null = useOtherUsersConversation(conversation)
+
   useEffect(() => {
-    if (!currUsername) return
+    if (!currId || !otherUsers) return
     setTitle(() => {
-      const otherUsers = conversation.users
-        .filter((user) => user.username !== currUsername)
-        .map((user) => user.username)
-      return otherUsers.join(', ')
+      if (conversation.name) return conversation.name
+      const names = otherUsers.map((user) => user.username)
+      return names.join(', ')
     })
-  }, [setTitle, currUsername, conversation.users])
+  }, [setTitle, currId, conversation, otherUsers])
 
   if (!session.data?.user.id) return <></>
 
@@ -57,7 +63,11 @@ export default function ConversationBox({
       href={`/conversations/${conversation.id}`}
       className="w-full flex shadow-md border-maroonlight border-1 p-3 mt-1 bg-navycustom rounded-xl hover:bg-customcoolcolor hover:transition-colors hover:cursor-pointer"
     >
-      <Avatar img={img} />
+      {conversation.isGroup ? (
+        <AvatarGroup users={otherUsers || []} />
+      ) : (
+        <Avatar img={img} />
+      )}
       <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300">{title}</div>
         <div className="w-full flex flex-row">

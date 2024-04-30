@@ -1,13 +1,17 @@
 import { Transition } from '@headlessui/react'
-import { Fragment, useCallback, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import Button from '@/components/Button'
 import { FullConversationType } from '@/app/types'
-import useOtherUserConversation from '@/app/hooks/useOtherUserConversation'
+import useOtherUserConversation, {
+  useOtherUsersConversation,
+} from '@/app/hooks/useOtherUserConversation'
 import Avatar from '@/components/Avatar'
 import { XIcon } from 'lucide-react'
 import { FaTrashAlt } from 'react-icons/fa'
 import DialogConfirm from './DialogConfirm'
+import { Titillium_Web } from 'next/font/google'
+import AvatarGroup from '../AvatarGroup'
 
 interface ProfileDrawerProps {
   isOpen: boolean
@@ -20,10 +24,24 @@ const ProfileDrawer = ({
   onClose,
   conversation,
 }: ProfileDrawerProps) => {
-  const otherUser = useOtherUserConversation(conversation)
+  const otherUsers = useOtherUsersConversation(conversation)
+  const [title, setTitle] = useState<string | null>()
   const [isOpenConfirmModal, setIsOpenConfirmModal] = useState(false)
 
-  if (!otherUser) return <></>
+  useEffect(() => {
+    if (!otherUsers) return
+    setTitle(() => {
+      if (conversation.name) return conversation.name
+      if (!conversation.isGroup) return otherUsers[0].username
+      return otherUsers.map((users) => users.username).join(', ')
+    })
+  }, [setTitle, conversation, otherUsers])
+
+  const isGroup = useMemo(() => conversation.isGroup, [conversation])
+  const emailSection = useMemo(() => {
+    return otherUsers?.map((user) => user.email).join(', ')
+  }, [otherUsers])
+  const createdAt = useMemo(() => conversation.createdAt, [conversation])
 
   return (
     <>
@@ -75,18 +93,27 @@ const ProfileDrawer = ({
                   <Dialog.Title className="font-semibold text-xl md:text-2xl text-white w-full">
                     <div className="flex flex-col w-full gap-2">
                       <div className="flex justify-center">
-                        <Avatar img={otherUser.image} />
+                        {!isGroup && (
+                          <Avatar img={otherUsers![0].image || '/gengar.jpg'} />
+                        )}
+                        {isGroup && <AvatarGroup users={otherUsers || []} />}
                       </div>
-                      <div className="flex justify-center">
-                        {otherUser.username}
-                      </div>
+                      <div className="flex justify-center">{title}</div>
                     </div>
                   </Dialog.Title>
                   <div className="text-xs text-slate-200 text-center mt-1">
-                    Joined at {otherUser.createdAt.toLocaleDateString()}
+                    {!isGroup && (
+                      <div>
+                        Joined at{' '}
+                        {otherUsers![0].createdAt.toLocaleDateString()}
+                      </div>
+                    )}
+                    {isGroup && (
+                      <div>Created at {createdAt.toLocaleDateString()}</div>
+                    )}
                   </div>
                   <div className="text-xs text-slate-300 text-center mt-1">
-                    Email {otherUser.email}
+                    {emailSection}
                   </div>
 
                   <div className="flex flex-col mt-10 gap-2">

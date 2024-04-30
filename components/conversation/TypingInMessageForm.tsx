@@ -36,7 +36,6 @@ export default function TypingInMessageForm() {
   )
 
   const handleUpload = (result: any) => {
-    console.log('Upload result', result)
     if (!session.data?.user.id) return
     axios.post('/api/messages', {
       image: result?.info?.secure_url,

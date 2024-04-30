@@ -17,7 +17,6 @@ export const FriendsOrRequestsContext = createContext<
 export default function UsersList() {
   const [state, setState] = useState<contextType>('friends')
   const friends = useFriends()
-  console.log(friends)
   if (!friends) return <></>
   return (
     <FriendsOrRequestsContext.Provider value={[state, setState]}>

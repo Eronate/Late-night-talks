@@ -17,7 +17,8 @@ export default function UserBox({ user }: { user: User }) {
   ) => {
     if (!session.data) return null
     const response = await axios.post('/api/conversations/', {
-      users: [session?.data.user?.email, user.email],
+      users: [session?.data.user?.id, user.id],
+      isGroup: false,
     })
     const conversation: Conversation | null = response.data
     if (!conversation) return null

@@ -17,6 +17,7 @@ import Input from '@/app/(site)/components/Input'
 import { CldUploadButton } from 'next-cloudinary'
 import { useSession } from 'next-auth/react'
 import { LucidePlusCircle } from 'lucide-react'
+import { User } from '@prisma/client'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -51,15 +52,26 @@ export default function SettingsModal({
       shouldValidate: true,
     })
   }
-  console.log('Yeaa', errors)
+
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     try {
       const fetchData = async () => {
+        if (!session.data?.user.id) return
         const response = await axios.post('/api/settings', {
           ...data,
           id: session.data.user.id,
         })
+        const responseData: User = response.data
         setIsOpen(false)
+        await session.update({
+          ...session.data,
+          user: {
+            ...session.data.user,
+            image: responseData.image,
+            username: responseData.username,
+          },
+        })
+        console.log('Session after update', session.data)
         router.refresh()
       }
       fetchData()
@@ -87,7 +99,7 @@ export default function SettingsModal({
               </div>
             </Dialog.Title>
             <div className="flex w-full mt-8 flex-col">
-              <div className="text-xs text-slate-400 mt-">Username</div>
+              <div className="text-xs text-slate-400">Username</div>
               <Input
                 key="username"
                 errors={errors['username'] as FieldError}

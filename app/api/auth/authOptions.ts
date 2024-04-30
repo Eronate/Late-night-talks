@@ -18,7 +18,6 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
 
       async profile(profile){
-        console.log(profile)
         let username = generateUsername();
         let tag = generateTag();
 
@@ -55,7 +54,6 @@ export const authOptions: AuthOptions = {
           password: { label: "password", type: "password" }
         },
         async authorize(credentials, req) {
-          console.log(credentials)
           if(!credentials)
             return null;
 
@@ -72,7 +70,6 @@ export const authOptions: AuthOptions = {
             return null;
 
           const match = await bcrypt.compare(credentials.password, user.hashedPassword)
-          console.log(match)
           if(!match)
             return null;
           return user as User;
@@ -80,13 +77,18 @@ export const authOptions: AuthOptions = {
       }),
     
   ],
-  debug: process.env.NODE_ENV === 'development',
+  // debug: process.env.NODE_ENV === 'development',
   session: 
   {
     strategy: 'jwt'
   },
   callbacks: {
-    jwt({token, user}) {
+    jwt({token, session, trigger, user}) {
+      if(trigger === "update" && session)
+      {
+        console.log("session in jwt", session)
+        return {...token, ...session?.user}
+      }
       if (user) {
         token.username = user.username;
         token.id = user.id;
@@ -95,6 +97,11 @@ export const authOptions: AuthOptions = {
       return token;
     },
     session({session, token}) {
+      // if(trigger === "update" && newSession)
+      // {
+      //   console.log("New session in session authOptions.ts", newSession)
+      //   session = newSession
+      // }
       if(token.username)
         session.user.username = token.username;
       if(token.id)

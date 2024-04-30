@@ -6,15 +6,33 @@ export async function POST(req: Request)
     try{
     const body = await req.json()
     const { image, username, id } = body as {image: string, username: string, id: string}
-    if(!image || !username || !id)
+
+    if(!image && !username )
         return NextResponse.json({error: 'Image or username not provided'}, {status: 400})
-    const user = await prismadb.user.update({
+    if(!id)
+        return NextResponse.json({error: 'Id not provided'}, {status: 400})
+
+    if(image)
+        await prismadb.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                image: image,
+            }
+        })
+    if(username)
+        await prismadb.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                username: username,
+            }
+        })
+    const user = await prismadb.user.findUnique({
         where: {
             id: id
-        },
-        data: {
-            image: image,
-            username: username
         }
     })
     return NextResponse.json(user)

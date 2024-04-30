@@ -15,7 +15,6 @@ export default async function ConversationWindow({
   )
 
   if (!conversation) return <div>Loading...</div>
-  console.log('Conversation', { conversation })
   return (
     <div className="w-full h-full bg-brownish4 p-1 flex-col flex">
       <Header conversation={conversation} />

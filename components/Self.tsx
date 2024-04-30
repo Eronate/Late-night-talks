@@ -8,7 +8,6 @@ import { useState } from 'react'
 export default function Self() {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const self = useSelf()
-  console.log('Self', self)
   if (!self) return <></>
   return (
     <>

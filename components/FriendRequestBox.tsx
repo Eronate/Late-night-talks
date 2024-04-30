@@ -44,7 +44,6 @@ export default function FriendRequestBox({
         .then((resp) => {
           toast.success('Friend request accepted')
           popFromState(user.id)
-          console.log(resp.data)
           setFriends([...(friends || []), resp.data])
         })
         .catch(handleError)

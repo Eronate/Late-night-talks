@@ -14,6 +14,9 @@ const nextConfig = {
     //       delete modularizeImports["@headlessui/react"];
     //     return config;
     //   },
+    image: {
+        domains: ["lh3.googleusercontent.com", "res.cloudinary.com"]
+    }
 };
 
 export default nextConfig;

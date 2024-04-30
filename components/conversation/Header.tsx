@@ -7,6 +7,7 @@ import { HiOutlineDotsHorizontal } from 'react-icons/hi'
 import Avatar from '../Avatar'
 import ProfileDrawer from './components/ProfileDrawer'
 import { FullConversationType } from '@/app/types'
+import AvatarGroup from './AvatarGroup'
 
 export default function Header({
   conversation,
@@ -32,10 +33,16 @@ export default function Header({
         conversation={conversation}
       />
       <div className="flex w-full bg-brownish3 p-4 rounded-2xl shadow-md">
-        <Avatar img={otherUsers[0]?.image} />
+        {conversation.isGroup ? (
+          <AvatarGroup users={otherUsers || []} />
+        ) : (
+          <Avatar img={otherUsers[0]?.image} />
+        )}
+
         <div className="pl-3">
           <p className="text-ellipsis text-white text-md">
-            {otherUsers?.map((user) => user.username).join(', ')}
+            {conversation.name ||
+              otherUsers?.map((user) => user.username).join(', ')}
           </p>
           <div className="text-ellipsis text-slate-500 text-xs">Active</div>
         </div>

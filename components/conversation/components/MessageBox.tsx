@@ -1,6 +1,8 @@
 import { FullMessageType } from '@/app/types'
 import { Message } from '@prisma/client'
 import clsx from 'clsx'
+import { useState } from 'react'
+import ImageModal from './ImageModal'
 
 export default function MessageBox({
   message,
@@ -30,15 +32,15 @@ export default function MessageBox({
   function formatDate(date: Date) {
     const now = new Date()
     const diffInDays = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60 * 24)
     )
 
     if (diffInDays > 0) {
       // If the date is more than 1 day ago, return the date string
-      return date.toLocaleDateString()
+      return new Date(date).toLocaleDateString()
     } else {
       // If the date is today, return the time string in HH:MM:SS format
-      return date.toLocaleTimeString([], {
+      return new Date(date).toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
@@ -46,6 +48,7 @@ export default function MessageBox({
     }
   }
 
+  const [isOpen, setIsOpen] = useState(false)
   const seenByString = message.seen
     .filter((user) => user.id !== message.senderId && user.id !== currId)
     .map((user) => user.username)
@@ -62,11 +65,20 @@ export default function MessageBox({
             />
             <div className="text-sm">{message.body && message.body}</div>
             <div className="p-2">
-              {message.image && (
-                <img
-                  src={message.image}
-                  className="object-cover cursor-pointer w-52 h-52 hover:scale-105 transition"
-                />
+              {!!message.image && (
+                <>
+                  <ImageModal
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    imgSrc={message.image}
+                  />
+                  <div onClick={() => setIsOpen(!isOpen)}>
+                    <img
+                      src={message.image}
+                      className="object-cover cursor-pointer w-52 h-52 hover:scale-105 transition"
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>
