@@ -1,5 +1,4 @@
 import clsx from 'clsx'
-import { Icon } from 'next/dist/lib/metadata/types/metadata-types'
 import { ReactNode } from 'react'
 
 interface IButtonProps {

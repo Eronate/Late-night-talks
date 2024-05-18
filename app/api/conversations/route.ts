@@ -1,4 +1,5 @@
 import prisma from "@/app/libs/prismadb"
+import { pusherServer } from "@/app/libs/pusher"
 import { NextResponse } from "next/server"
 
 //Expects the users' ids
@@ -34,9 +35,20 @@ export async function POST(req: Request) {
                         name: name
                     },
                     include: {
-                        users: true
+                        users: true,
+                        messages: {
+                            include: {
+                                seen: true,
+                                sender: true
+                            }
+                        }
                     }
                 })
+                const allPromises = users.map( (user) => { 
+                    return pusherServer.trigger(`conversations-list-${user}`, "new-conversation", conversationCreated)
+                })
+                await Promise.all(allPromises)
+
                 return NextResponse.json(conversationCreated)
             }
             catch(err)
@@ -55,9 +67,20 @@ export async function POST(req: Request) {
                 name: name
             },
             include: {
-                users: true
+                users: true,
+                messages: {
+                    include: {
+                        seen: true,
+                        sender: true
+                    }
+                }
             }
         })
+        const allPromises = conversationCreated.users.map( (user) => {
+            return pusherServer.trigger(`conversations-list-${user.id}`, "new-conversation", conversationCreated)
+        })
+        await Promise.all(allPromises)
+       
         return NextResponse.json(conversationCreated)
     }
     catch(err)

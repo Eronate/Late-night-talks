@@ -8,6 +8,7 @@ import Avatar from '../Avatar'
 import ProfileDrawer from './components/ProfileDrawer'
 import { FullConversationType } from '@/app/types'
 import AvatarGroup from './AvatarGroup'
+import { Skeleton } from '../ui/skeleton'
 
 export default function Header({
   conversation,
@@ -23,7 +24,19 @@ export default function Header({
       return users.filter((user) => user?.email !== session.data?.user?.email)
   }, [users, session?.data?.user])
 
-  if (!session.data) return <div>Loading...</div>
+  if (!session.data)
+    return (
+      <div className="flex w-full bg-brownish3 p-4 rounded-2xl shadow-md">
+        <Skeleton className="w-[40px] h-[40px] bg-gray-500 rounded-full" />
+        <div className="pl-3">
+          <Skeleton className="w-[80px] h-[16px] bg-gray-500" />
+          <Skeleton className="w-[30px] h-[12px] mt-3 bg-gray-500" />
+        </div>
+        <div className="ml-auto">
+          <HiOutlineDotsHorizontal className="h-5 w-5 text-white rounded-full" />
+        </div>
+      </div>
+    )
 
   return (
     <>

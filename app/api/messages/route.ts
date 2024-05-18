@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         
         await pusherServer.trigger(`messages-${conversationId}`, 'new-message', message)
 
-        const updatedConveersation = await prismadb.conversation.update({
+        const updatedConversation = await prismadb.conversation.update({
             where: {
                 id: conversationId
             },
@@ -79,7 +79,12 @@ export async function POST(req: Request) {
                     }
                 }
             }
+        })      
+
+        const allPromises = updatedConversation.users.map( (user) => {
+            return pusherServer.trigger(`conversations-list-${user.id}`, 'new-message', message)
         })
+        await Promise.all(allPromises)
 
         return NextResponse.json(message, { status: 200 });
     }

@@ -3,6 +3,52 @@ import { Message } from '@prisma/client'
 import clsx from 'clsx'
 import { useState } from 'react'
 import ImageModal from './ImageModal'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const LoadingSkeletal = (message: FullMessageType) => {
+  const condition = Math.random() > 0.5
+
+  const randomLength = Math.max(Math.floor(Math.random() * 200), 50).toString()
+  console.log(randomLength)
+  const style = clsx(
+    `
+    flex
+    flex-col
+    py-2
+    px-4
+    rounded-2xl
+    shadow-lg
+    ring-1
+    ring-slate-200
+    bg-slate-300
+  `,
+    condition ? 'ml-auto' : 'mr-auto'
+  )
+  return (
+    <div className="flex m-2">
+      <div className={style}>
+        <div className="flex gap-2 w-max">
+          {!condition && <Skeleton className="h-6 w-6 bg-navycustom mr-auto" />}
+          <Skeleton
+            style={{ width: `${randomLength}px` }}
+            className={`h-4 bg-slate-600`}
+          />
+          {condition && <Skeleton className="ml-auto h-6 w-6 bg-navycustom" />}
+          {!!message.image && (
+            <div className="p-2">
+              <Skeleton className="w-52 h-52 bg-slate-600" />
+            </div>
+          )}
+        </div>
+        <div className="flex w-full">
+          <div className={clsx(condition ? 'mr-auto' : 'ml-auto')}>
+            <Skeleton className="w-10 h-2 bg-slate-600" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function MessageBox({
   message,
@@ -10,7 +56,7 @@ export default function MessageBox({
   isLast,
 }: {
   message: FullMessageType
-  currId: string
+  currId?: string
   isLast: boolean
 }) {
   const style = clsx(
@@ -47,8 +93,10 @@ export default function MessageBox({
       })
     }
   }
-
   const [isOpen, setIsOpen] = useState(false)
+
+  if (!currId) return LoadingSkeletal(message)
+
   const seenByString = message.seen
     .filter((user) => user.id !== message.senderId && user.id !== currId)
     .map((user) => user.username)
@@ -59,13 +107,21 @@ export default function MessageBox({
       <div className="flex m-2">
         <div className={style}>
           <div className="flex gap-2">
-            <img
-              src={message.sender.image || '/gengar.jpg'}
-              className="h-6 w-6"
-            />
+            {currId !== message.senderId && (
+              <img
+                src={message.sender.image || '/gengar.jpg'}
+                className="mr-auto h-6 w-6"
+              />
+            )}
             <div className="text-sm">{message.body && message.body}</div>
-            <div className="p-2">
-              {!!message.image && (
+            {currId === message.senderId && (
+              <img
+                src={message.sender.image || '/gengar.jpg'}
+                className="ml-auto h-6 w-6"
+              />
+            )}
+            {!!message.image && (
+              <div className="p-2">
                 <>
                   <ImageModal
                     isOpen={isOpen}
@@ -79,8 +135,8 @@ export default function MessageBox({
                     />
                   </div>
                 </>
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <div className="flex w-full">
             <div
@@ -104,7 +160,7 @@ export default function MessageBox({
         {isLast && (
           <div
             className={clsx(
-              'text-[10px] text-slate-200 pb-2 px-2',
+              'text-xs pb-2 text-slate-200 px-2',
               currId === message.senderId ? 'ml-auto' : 'mr-auto'
             )}
           >

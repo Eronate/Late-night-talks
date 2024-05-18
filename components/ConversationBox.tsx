@@ -10,6 +10,7 @@ import useOtherUserConversation, {
 } from '@/app/hooks/useOtherUserConversation'
 import AvatarGroup from './conversation/AvatarGroup'
 import { User } from '@prisma/client'
+import { Skeleton } from './ui/skeleton'
 
 export default function ConversationBox({
   conversation,
@@ -19,12 +20,16 @@ export default function ConversationBox({
   const session = useSession()
   const currUsername = session?.data?.user.username
   const currId = session?.data?.user.id
-  const [lastMessage, setLastMesasge] = useState(
-    conversation?.messages[conversation.messages.length - 1] || null
+  const lastMessage = useMemo(
+    () => conversation?.messages[conversation.messages.length - 1] || null,
+    [conversation]
   )
-  const [lastMesageAt, setLastMessageAt] = useState<Date | null>(
-    conversation?.lastMessageAt || conversation.createdAt
+
+  const lastMesageAt = useMemo(
+    () => conversation?.lastMessageAt || conversation.createdAt,
+    [conversation]
   )
+
   const [title, setTitle] = useState<string | null>()
 
   const otherUser = useOtherUserConversation(conversation)
@@ -47,7 +52,23 @@ export default function ConversationBox({
     })
   }, [setTitle, currId, conversation, otherUsers])
 
-  if (!session.data?.user.id) return <></>
+  if (!session.data?.user.id)
+    return (
+      <div className="w-full flex shadow-md border-1 p-3 mt-1 bg-customcoolcolor rounded-xl">
+        <Skeleton className="w-[50px] h-[50px] bg-gray-500" />
+        <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
+          <div className="text-md text-slate-300 min-w-0 overflow-hidden text-ellipsis">
+            <Skeleton className="w-[50px] h-[10px] bg-gray-500" />
+          </div>
+          <div className="w-full flex flex-row">
+            <Skeleton className="w-[50px] h-[10px] bg-gray-500" />
+            <div className="pl-3 flex ml-auto self-end text-xs text-slate-500">
+              <Skeleton className="w-[50px] h-[10px] bg-gray-500" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
 
   const textStyle = clsx(
     `
@@ -69,7 +90,9 @@ export default function ConversationBox({
         <Avatar img={img} />
       )}
       <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
-        <div className="text-md text-slate-300">{title}</div>
+        <div className="text-md text-slate-300 min-w-0 overflow-hidden text-ellipsis">
+          {title}
+        </div>
         <div className="w-full flex flex-row">
           <div className={textStyle}>{lastMessageBody}</div>
           <div className="pl-3 flex ml-auto self-end text-xs text-slate-500">

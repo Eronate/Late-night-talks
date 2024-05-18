@@ -1,6 +1,7 @@
 import { prismadb } from "@/app/libs/prismadb"
 import getCurrentUser from "@/app/actions/getCurrentUser"
 import { NextResponse } from "next/server"
+import { pusherServer } from "@/app/libs/pusher"
 export async function POST(req: Request, 
     { params } : {params: {conversationId?: string}}
 ) {
@@ -17,7 +18,8 @@ export async function POST(req: Request,
                 id: conversationId
             },
             select: {
-                messages: true
+                messages: true,
+                users: true
             }
         })
         
@@ -36,9 +38,23 @@ export async function POST(req: Request,
                     connect: {
                         id: user.id
                     }
-                }
+                },
+            },
+            include: {
+                seen: true
             }
         })
+        if(!messageSeen)
+            return NextResponse.json("Message not found", {status: 404})
+
+        await pusherServer.trigger(`messages-${conversationId}`, "seen-message", messageSeen)
+
+        const allPromises = conversation.users.map( (user) => { 
+            return pusherServer.trigger(`conversations-list-${user.id}`, "seen-message", messageSeen)
+        })
+        
+        await Promise.all(allPromises)
+
         return NextResponse.json(messageSeen)
     }
     catch(err)
