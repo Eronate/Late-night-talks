@@ -1,7 +1,7 @@
 'use client'
 import getConversations from '@/app/actions/getConversations'
 import { FullConversationType, FullMessageType } from '@/app/types'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react'
 import { MdGroupAdd } from 'react-icons/md'
 import ConversationBox from './ConversationBox'
 import Self from './Self'
@@ -9,23 +9,33 @@ import GroupChatAddModal from './conversation/GroupChatAddModal'
 import { pusherClient } from '@/app/libs/pusher'
 import { User } from '@prisma/client'
 import { useSession } from 'next-auth/react'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import { Router } from 'lucide-react'
+import { Dialog } from '@headlessui/react'
+import Button from './Button'
+import clsx from 'clsx'
 
 export default function ConversationList({
   initialItems,
+  isFromMenu = false,
 }: {
   initialItems: FullConversationType[]
+  isFromMenu?: boolean
 }) {
   const [conversations, setConversations] = useState(initialItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDeletedModalOpen, setIsDeletedModalOpen] = useState(false)
+
   const session = useSession()
   const currUser = session.data?.user
-
+  const params = useParams()
+  // const router = useRouter()
+  // const pathname = usePathname()
   useEffect(() => {
     if (!currUser) return
     const channel = pusherClient.subscribe(`conversations-list-${currUser.id}`)
 
     const newMessageHandler = (lastSentMessage: FullMessageType) => {
-      console.log('In da handla', lastSentMessage)
       setConversations((prev) => {
         return prev.map((item) => {
           if (item.id !== lastSentMessage.conversationId) {
@@ -40,6 +50,7 @@ export default function ConversationList({
       })
     }
     const newConversationHandler = (conversation: FullConversationType) => {
+      console.log('new conv handler', conversation)
       setConversations((prev) => [...prev, conversation])
     }
 
@@ -47,6 +58,7 @@ export default function ConversationList({
       setConversations((prev) => {
         return prev.filter((item) => item.id !== id)
       })
+      if (params && params.conversationId === id) setIsDeletedModalOpen(true)
     }
 
     const seenMessageHandler = (
@@ -88,13 +100,21 @@ export default function ConversationList({
     }
   }, [setConversations, currUser])
 
-  //loading skeleton
-  if (!conversations) return <div>Loading...</div>
+  const styleForMenu = clsx(
+    `
+    flex-col bg-navycustom w-full sm:w-max
+  `,
+    isFromMenu ? 'flex' : 'sm:flex hidden'
+  )
 
   return (
     <>
       <GroupChatAddModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
-      <div className="sm:flex flex-col bg-navycustom hidden">
+      <ConversationDeletedNotificationModal
+        isOpen={isDeletedModalOpen}
+        setIsOpen={setIsDeletedModalOpen}
+      />
+      <div className={styleForMenu}>
         <div className="flex items-center">
           <div className="text-xl text-slate-300 p-4 text-start">
             Conversations
@@ -114,5 +134,51 @@ export default function ConversationList({
         </div>
       </div>
     </>
+  )
+}
+
+interface ConversationDeletedNotificationModal {
+  isOpen: boolean
+  setIsOpen: Dispatch<React.SetStateAction<boolean>>
+}
+
+const ConversationDeletedNotificationModal = ({
+  isOpen,
+  setIsOpen,
+}: ConversationDeletedNotificationModal) => {
+  const router = useRouter()
+
+  const handleConfirm = () => {
+    router.push('/conversations')
+    setIsOpen(false)
+  }
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      className="relative z-50"
+    >
+      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+
+      <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+        <Dialog.Panel className="shadow-2xl ring-1 ring-black mx-auto max-w-96 bg-navycustom rounded-lg p-4 text-center text-lg text-slate-300 gap-7 flex flex-col">
+          <Dialog.Title>
+            <div className="font-semibold">
+              The current conversation has been deleted by one of the users
+            </div>
+          </Dialog.Title>
+          <div className="flex gap-4 ml-auto">
+            <Button
+              variant="danger"
+              className="ml-auto"
+              onClick={handleConfirm}
+            >
+              Understood
+            </Button>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   )
 }

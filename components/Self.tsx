@@ -40,7 +40,7 @@ export default function Self() {
           <div className="w-max relative h-max shadow-xl rounded-full ">
             <img
               src={self.image || '/gengar.jpg'}
-              className="w-auto max-h-16 border-dotted border-2 shadow-lg border-black"
+              className="w-16 h-16 border-dotted border-2 shadow-lg border-black"
             />
             <div className="absolute top-0 right-0 w-2 h-2 bg-green-400 ring-navycustom ring-4 z-50 rounded-full" />
           </div>

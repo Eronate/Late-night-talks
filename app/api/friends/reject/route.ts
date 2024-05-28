@@ -3,6 +3,8 @@ import { requestBodySchema } from "../add/route";
 import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import RemoveBothRequests from "../utils/removeBothRequests";
+import { pusherServer } from "@/app/libs/pusher";
+import { getMeaningfulUserFields } from "@/app/types";
 
 export async function POST(req: Request) {
     try{
@@ -17,23 +19,31 @@ export async function POST(req: Request) {
             receiver
         } = response
 
-        await prismadb.user.update({
+        const senderUpdated = await prismadb.user.update({
             where:{
                 email: sender
             },
             data: {
                 sentFriendRequestIds: sentFriendRequestIdsFiltered
+            },
+            select: {
+                id: true
             }
         })
-
-        await prismadb.user.update({
+    
+        const receiverUpdated = await prismadb.user.update({
             where:{
                 email: receiver
             },
             data: {
                 friendsRequestIds: friendRequestIdsFiltered
             }
-        })
+        }) 
+
+        const pusherReceiver = getMeaningfulUserFields(receiverUpdated)
+
+        await pusherServer.trigger(`friend-requests-${senderUpdated.id}`, 'sent-request-rejected', pusherReceiver )
+        
         return NextResponse.json('Friend request rejected', { status: 200 })
     }
     catch(err)

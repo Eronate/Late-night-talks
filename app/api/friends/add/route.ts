@@ -1,4 +1,6 @@
 import prisma from "@/app/libs/prismadb"
+import { pusherServer } from "@/app/libs/pusher";
+import { getMeaningfulUserFields } from "@/app/types";
 import { NextResponse } from "next/server";
 import * as z from 'zod'
 
@@ -34,19 +36,19 @@ export async function POST(req: Request) {
         },
     })
     if(!foundSender)
-        return Response.json({ error: 'Sender not found' }, { status: 400 })
+        return NextResponse.json({ error: 'Sender not found' }, { status: 400 })
 
     if(!foundReceiver)
-        return Response.json({ error: 'Receiver not found' }, { status: 400 })
+        return NextResponse.json({ error: 'Receiver not found' }, { status: 400 })
 
     if(foundReceiver.friendsRequestIds.includes(sender))
-        return Response.json({ error: 'You have already sent a friend request to this user' }, { status: 201 })
+        return NextResponse.json({ error: 'You have already sent a friend request to this user' }, { status: 201 })
 
     if(foundReceiver.sentFriendRequestIds.includes(sender))
-        return Response.json({ error: 'You have a pending friend request from this user' }, { status: 201 })
+        return NextResponse.json({ error: 'You have a pending friend request from this user' }, { status: 201 })
 
     if(foundReceiver.friendIds.includes(foundRequester.id))
-        return Response.json({ error: 'You are already friends with this user!' }, { status: 201 })
+        return NextResponse.json({ error: 'You are already friends with this user!' }, { status: 201 })
 
     const sendFriendRequestToReceiver = await prisma.user.update({
         where: {
@@ -61,6 +63,8 @@ export async function POST(req: Request) {
             friendsRequest: true
         }
     })
+    const pusherSender = getMeaningfulUserFields(foundSender)
+    await pusherServer.trigger(`friend-requests-${receiver}`, 'new-request', pusherSender)
 
     const addRequestToPendingForSender = await prisma.user.update({
         where: {
@@ -77,7 +81,7 @@ export async function POST(req: Request) {
     })
 
     if(!sendFriendRequestToReceiver || !addRequestToPendingForSender)
-        return Response.json({ error: 'Error in sending friend request' }, { status: 400 })
+        return NextResponse.json({ error: 'Error in sending friend request' }, { status: 400 })
 
     return NextResponse.json(sendFriendRequestToReceiver)
 }   

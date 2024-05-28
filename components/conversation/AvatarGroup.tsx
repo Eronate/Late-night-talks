@@ -1,10 +1,10 @@
 'use client'
 
-import { User } from '@prisma/client'
+import { MeaningfulUserFields } from '@/app/types'
 import Image from 'next/image'
 
 interface AvatarGroupProps {
-  users?: User[]
+  users?: MeaningfulUserFields[]
 }
 
 const AvatarGroup: React.FC<AvatarGroupProps> = ({ users = [] }) => {
@@ -37,7 +37,7 @@ const AvatarGroup: React.FC<AvatarGroupProps> = ({ users = [] }) => {
             ${positionMap[index as keyof typeof positionMap]}
           `}
         >
-          <img alt="Avatar" fill src={user?.image || '/gengar.jpg'} />
+          <img alt="Avatar" src={user?.image || '/gengar.jpg'} />
         </div>
       ))}
     </div>

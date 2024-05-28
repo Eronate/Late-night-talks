@@ -1,6 +1,9 @@
 import prisma from "@/app/libs/prismadb"
 import { pusherServer } from "@/app/libs/pusher"
+import { getMeaningfulUserFields } from "@/app/types"
 import { NextResponse } from "next/server"
+
+
 
 //Expects the users' ids
 export async function POST(req: Request) {
@@ -44,8 +47,16 @@ export async function POST(req: Request) {
                         }
                     }
                 })
+
+                const conversationPusher = {
+                    ...conversationCreated,
+                    users: conversationCreated.users.map( (user) => getMeaningfulUserFields(user) ),
+                    seen: [],
+                    sender: []
+                }
+
                 const allPromises = users.map( (user) => { 
-                    return pusherServer.trigger(`conversations-list-${user}`, "new-conversation", conversationCreated)
+                    return pusherServer.trigger(`conversations-list-${user}`, "new-conversation", conversationPusher)
                 })
                 await Promise.all(allPromises)
 
@@ -76,9 +87,20 @@ export async function POST(req: Request) {
                 }
             }
         })
+
+        const conversationPusher = {
+            ...conversationCreated,
+            users: conversationCreated.users.map( (user) => getMeaningfulUserFields(user) ),
+            seen: [],
+            sender: []
+        }
+        
+
         const allPromises = conversationCreated.users.map( (user) => {
-            return pusherServer.trigger(`conversations-list-${user.id}`, "new-conversation", conversationCreated)
+            return pusherServer.trigger(`conversations-list-${user.id}`, "new-conversation", 
+            conversationPusher)
         })
+
         await Promise.all(allPromises)
        
         return NextResponse.json(conversationCreated)

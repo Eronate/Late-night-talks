@@ -1,8 +1,11 @@
-import { ZodError } from "zod";
+    import { ZodError } from "zod";
 import { requestBodySchema } from "../add/route";
 import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import RemoveBothRequests from "../utils/removeBothRequests";
+import { pusherServer } from "@/app/libs/pusher";
+import { getMeaningfulUserFields } from "@/app/types";
+
 export async function POST(req: Request) {
     try{
     const response = await RemoveBothRequests(req)
@@ -27,9 +30,9 @@ export async function POST(req: Request) {
                 push: senderId
             }
         }
-    })
-
-    await prismadb.user.update({
+    })  
+    
+    const senderUser = await prismadb.user.update({
         where:{
             email: sender
         },
@@ -40,6 +43,9 @@ export async function POST(req: Request) {
             }
         }
     })
+    const pusherReceiver = await getMeaningfulUserFields(receiverUser)
+    await pusherServer.trigger(`friend-requests-${senderId}`, 'accepted-request', pusherReceiver)
+
     return NextResponse.json(receiverUser)
     }
     catch(err) {

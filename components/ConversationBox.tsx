@@ -1,4 +1,4 @@
-import { FullConversationType } from '@/app/types'
+import { FullConversationType, MeaningfulUserFields } from '@/app/types'
 import Avatar from './Avatar'
 import formatLastMessageTime from '@/lib/formatTime'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -20,6 +20,7 @@ export default function ConversationBox({
   const session = useSession()
   const currUsername = session?.data?.user.username
   const currId = session?.data?.user.id
+
   const lastMessage = useMemo(
     () => conversation?.messages[conversation.messages.length - 1] || null,
     [conversation]
@@ -41,7 +42,8 @@ export default function ConversationBox({
     else return lastMessage?.body || 'Started a conversation'
   }, [lastMessage])
 
-  const otherUsers: User[] | null = useOtherUsersConversation(conversation)
+  const otherUsers: MeaningfulUserFields[] | null =
+    useOtherUsersConversation(conversation)
 
   useEffect(() => {
     if (!currId || !otherUsers) return
@@ -87,7 +89,7 @@ export default function ConversationBox({
       {conversation.isGroup ? (
         <AvatarGroup users={otherUsers || []} />
       ) : (
-        <Avatar img={img} />
+        otherUser && <Avatar img={img} userEmail={otherUser.email!} />
       )}
       <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300 min-w-0 overflow-hidden text-ellipsis">

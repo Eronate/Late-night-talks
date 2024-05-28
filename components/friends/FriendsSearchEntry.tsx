@@ -33,7 +33,7 @@ export default function FriendsSearchEntry({ user }: { user: User }) {
   }
   return (
     <div onClick={handleClick} className={style}>
-      <Avatar img={user.image} />
+      <Avatar img={user.image} userEmail={user.email!} />
       <div className="flex ml-2 flex-col justify-center min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300">{user.username}</div>
       </div>

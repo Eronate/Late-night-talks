@@ -5,9 +5,9 @@ const useConversation = () => {
   const params = useParams()
 
   const conversationId = useMemo(() => {
-    if (!params.conversationId) return ''
+    if (!params || !params.conversationId) return ''
     return params.conversationId as string
-  }, [params.conversationId])
+  }, [params])
 
   const isOpen = useMemo(() => !!conversationId, [conversationId])
 

@@ -9,6 +9,8 @@ import ProfileDrawer from './components/ProfileDrawer'
 import { FullConversationType } from '@/app/types'
 import AvatarGroup from './AvatarGroup'
 import { Skeleton } from '../ui/skeleton'
+import { ChevronLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header({
   conversation,
@@ -46,10 +48,13 @@ export default function Header({
         conversation={conversation}
       />
       <div className="flex w-full bg-brownish3 p-4 rounded-2xl shadow-md">
+        <Link className="sm:hidden flex" href={'/conversations'}>
+          <ChevronLeft className="w-9 text-blue-400 flex items-center h-full hover:bg-slate-400 hover:bg-opacity-25 px-1 mx-1 cursor-pointer transition-colors rounded-full" />
+        </Link>
         {conversation.isGroup ? (
           <AvatarGroup users={otherUsers || []} />
         ) : (
-          <Avatar img={otherUsers[0]?.image} />
+          <Avatar img={otherUsers[0]?.image} userEmail={otherUsers[0].email!} />
         )}
 
         <div className="pl-3">

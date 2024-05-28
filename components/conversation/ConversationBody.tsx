@@ -1,12 +1,14 @@
 'use client'
 import { FullConversationType, FullMessageType } from '@/app/types'
-import ConversationBox from '../ConversationBox'
-import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import axios from 'axios'
 import MessageBox from './components/MessageBox'
 import { pusherClient } from '@/app/libs/pusher'
 import { Message, User } from '@prisma/client'
+
+const overflownLeverage = 300
+const normalLeverage = 10
 
 export default function ConversationBody({
   conversation,
@@ -19,18 +21,64 @@ export default function ConversationBody({
   const scrollableRef = useRef<HTMLDivElement>(null)
   const [messages, setMessages] = useState(conversation.messages)
 
+  function isOverflown(element: HTMLDivElement) {
+    return (
+      element.scrollHeight > element.clientHeight ||
+      element.scrollWidth > element.clientWidth
+    )
+  }
+
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
   useEffect(() => {
-    if (messages && bottomRef.current) {
-      const { scrollHeight, scrollTop, clientHeight } = bottomRef.current
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) <= 1) {
+    scrollToBottom()
+  }, [scrollToBottom])
+
+  const checkIfBottomAndScroll = useCallback(() => {
+    if (messages && scrollableRef.current) {
+      const { scrollHeight, scrollTop, clientHeight } = scrollableRef.current
+      if (
+        Math.abs(scrollHeight - clientHeight - scrollTop) <=
+          overflownLeverage &&
+        isOverflown(scrollableRef.current)
+      ) {
         scrollToBottom()
+      } else {
+        if (
+          currId &&
+          messages.length > 0 &&
+          !isOverflown(scrollableRef.current) &&
+          !messages[messages.length - 1].seenIds.includes(currId)
+        ) {
+          axios.post(`/api/conversations/${conversation.id}/seen`)
+        }
       }
     }
-  }, [])
+  }, [messages, scrollToBottom, currId, conversation.id, scrollableRef])
+
+  useEffect(() => {
+    checkIfBottomAndScroll()
+  }, [messages, checkIfBottomAndScroll])
+
+  // useEffect(() => {
+  //   const checkIfVisible = async () => {
+  //     if (!scrollableRef.current || !bottomRef.current) return
+  //     const isVisible = await isVisibleFnc(
+  //       bottomRef.current,
+  //       scrollableRef.current
+  //     )
+  //     if (
+  //       currId &&
+  //       isVisible &&
+  //       !messages[messages.length - 1].seenIds.includes(currId)
+  //     ) {
+  //       axios.post(`/api/conversations/${conversation.id}/seen`)
+  //     }
+  //   }
+  //   checkIfVisible()
+  // }, [messages, conversation.id, bottomRef, currId, scrollableRef])
 
   useEffect(() => {
     try {
@@ -40,9 +88,15 @@ export default function ConversationBody({
       const newMessageHandler = (data: FullMessageType) => {
         console.log('Data gotten', data)
         setMessages((prev) => [...prev, data])
+        // if (
+        //   scrollableRef.current &&
+        //   scrollableRef.current.scrollHeight <=
+        //     scrollableRef.current.scrollTop + scrollableRef.current.clientHeight
+        // )
+        //   axios.post(`/api/conversations/${conversation.id}/seen`)
       }
 
-      const seenMessageHandler = (data: Message & { seen: User[] }) => {
+      const seenMessageHandler = (data: FullMessageType) => {
         console.log('Data gotten seen', data)
         setMessages((prev) => {
           const messagesUpdated = prev.slice(0, prev.length - 1).concat({
@@ -72,14 +126,13 @@ export default function ConversationBody({
     (e: Event) => {
       const target = e.target as HTMLDivElement
       const bottom =
-        Math.abs(
-          target.scrollHeight - target.scrollTop - target.clientHeight
-        ) <= 1
+        target.scrollHeight - target.scrollTop - target.clientHeight <
+        normalLeverage
 
       if (bottom && currId) {
         if (
           messages.length > 0 &&
-          !(currId in messages[messages.length - 1].seenIds)
+          !messages[messages.length - 1].seenIds.includes(currId)
         ) {
           axios.post(`/api/conversations/${conversation.id}/seen`)
         }

@@ -94,7 +94,10 @@ const ProfileDrawer = ({
                     <div className="flex flex-col w-full gap-2">
                       <div className="flex justify-center">
                         {!isGroup && (
-                          <Avatar img={otherUsers![0].image || '/gengar.jpg'} />
+                          <Avatar
+                            img={otherUsers![0].image || '/gengar.jpg'}
+                            userEmail={otherUsers![0].email!}
+                          />
                         )}
                         {isGroup && <AvatarGroup users={otherUsers || []} />}
                       </div>

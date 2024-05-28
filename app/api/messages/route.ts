@@ -1,5 +1,6 @@
 import { prismadb } from "@/app/libs/prismadb";
 import { pusherServer } from "@/app/libs/pusher";
+import { getMeaningfulUserFields } from "@/app/types";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -58,7 +59,17 @@ export async function POST(req: Request) {
         //     }   
         // })
         
-        await pusherServer.trigger(`messages-${conversationId}`, 'new-message', message)
+        const pusherMessage = {
+            ...message,
+            seen: message.seen.map( (user) => getMeaningfulUserFields(user)),
+            sender: getMeaningfulUserFields(message.sender)
+        }
+
+        await pusherServer.trigger(
+            `messages-${conversationId}`, 
+            'new-message',
+            pusherMessage
+        )
 
         const updatedConversation = await prismadb.conversation.update({
             where: {
@@ -82,7 +93,7 @@ export async function POST(req: Request) {
         })      
 
         const allPromises = updatedConversation.users.map( (user) => {
-            return pusherServer.trigger(`conversations-list-${user.id}`, 'new-message', message)
+            return pusherServer.trigger(`conversations-list-${user.id}`, 'new-message', pusherMessage)
         })
         await Promise.all(allPromises)
 

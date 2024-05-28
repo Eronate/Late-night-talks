@@ -66,7 +66,7 @@ export default function GroupChatAddModal({
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <Dialog.Panel className="shadow-2xl ring-1 ring-black mx-auto w-[40vw] bg-navycustom rounded-lg p-4 text-center text-lg text-slate-300 gap-7 flex flex-col">
+          <Dialog.Panel className="shadow-2xl ring-1 ring-black mx-auto w-[80vw] sm:w-[40vw]  bg-navycustom rounded-lg p-4 text-center text-lg text-slate-300 gap-7 flex flex-col">
             <Dialog.Title>
               <div className="font-semibold">Create a group chat</div>
               <div className="flex text-wrap text-sm mt-4">

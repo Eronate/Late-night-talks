@@ -30,7 +30,7 @@ export default function UserBox({ user }: { user: User }) {
       onClick={(e) => handleClick(e, user)}
       className="w-full flex shadow-md border-maroonlight border-1 p-3 mt-1 bg-navycustom rounded-xl hover:bg-customcoolcolor hover:transition-colors hover:cursor-pointer"
     >
-      <Avatar img={user.image} />
+      <Avatar img={user.image} userEmail={user.email!} />
       <div className="flex ml-2 flex-col justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-300">{user.username}</div>
         <div className="w-full flex flex-row">

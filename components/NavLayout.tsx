@@ -1,11 +1,18 @@
+import clsx from 'clsx'
 import DesktopSidebar from './DesktopSidebar'
 import MobileFooter from './MobileFooter'
 
-export default function NavLayout({ children }: { children: React.ReactNode }) {
+export default function NavLayout({
+  children,
+  isMobileConversationsPage = false,
+}: {
+  children: React.ReactNode
+  isMobileConversationsPage?: boolean
+}) {
   return (
     <div className="w-full h-full overflow-visible flex">
       <DesktopSidebar />
-      <MobileFooter />
+      {!isMobileConversationsPage && <MobileFooter />}
       {children}
     </div>
   )

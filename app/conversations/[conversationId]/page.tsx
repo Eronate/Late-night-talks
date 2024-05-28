@@ -1,9 +1,13 @@
 import getConversationByIdWithMessages from '@/app/actions/getConversationByIdWithMessages'
-import { FullConversationType } from '@/app/types'
+import getConversations from '@/app/actions/getConversations'
+import ConversationList from '@/components/ConversationList'
+import NavLayout from '@/components/NavLayout'
 import ConversationBody from '@/components/conversation/ConversationBody'
 import Header from '@/components/conversation/Header'
 import TypingInMessageForm from '@/components/conversation/TypingInMessageForm'
-import { useMemo } from 'react'
+import { redirect } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 
 export default async function ConversationWindow({
   params,
@@ -14,12 +18,21 @@ export default async function ConversationWindow({
     params.conversationId
   )
 
-  if (!conversation) return <div>Loading...</div>
+  const initialConversations = await getConversations()
+
+  if (!initialConversations || !conversation) return redirect('/conversations')
+
   return (
-    <div className="w-full h-full bg-brownish4 p-1 flex-col flex">
-      <Header conversation={conversation} />
-      <ConversationBody conversation={conversation} />
-      <TypingInMessageForm />
-    </div>
+    <NavLayout isMobileConversationsPage>
+      <ConversationList
+        initialItems={initialConversations}
+        isFromMenu={false}
+      />
+      <div className="w-full h-full bg-brownish4 p-1 flex-col flex">
+        <Header conversation={conversation} />
+        <ConversationBody conversation={conversation} />
+        <TypingInMessageForm />
+      </div>
+    </NavLayout>
   )
 }

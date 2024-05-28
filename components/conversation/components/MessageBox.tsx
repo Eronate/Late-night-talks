@@ -69,6 +69,8 @@ export default function MessageBox({
     shadow-lg
     ring-1
     ring-slate-200
+    text-wrap
+    break-all
   `,
     currId === message.senderId
       ? 'ml-auto bg-maroonlight'
@@ -104,16 +106,18 @@ export default function MessageBox({
 
   return (
     <>
-      <div className="flex m-2">
+      <div className="flex w-full p-2 h-auto">
         <div className={style}>
-          <div className="flex gap-2">
+          <div className="flex text-wrap gap-2 h-auto">
             {currId !== message.senderId && (
               <img
                 src={message.sender.image || '/gengar.jpg'}
                 className="mr-auto h-6 w-6"
               />
             )}
-            <div className="text-sm">{message.body && message.body}</div>
+            <div className="flex text-sm text-wrap max-w-60 h-auto">
+              {message.body && message.body}
+            </div>
             {currId === message.senderId && (
               <img
                 src={message.sender.image || '/gengar.jpg'}

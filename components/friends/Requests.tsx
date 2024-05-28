@@ -8,6 +8,8 @@ import { User } from '@prisma/client'
 import FriendRequestBox from '../FriendRequestBox'
 import useBearStore from '@/app/stores/bearStore'
 import { set } from 'zod'
+import { pusherClient } from '@/app/libs/pusher'
+import { MeaningfulUserFields } from '@/app/types'
 
 export default function Requests() {
   const session = useSession()
@@ -17,6 +19,7 @@ export default function Requests() {
     sentRequests,
     setIncomingRequests,
     setSentRequests,
+    addToIncomingRequests,
   } = useBearStore()
 
   useEffect(() => {
@@ -24,7 +27,10 @@ export default function Requests() {
     const fetchRequests = async () => {
       const response = await axios.get(`/api/friends/requests/?id=${currentId}`)
       const requests = response.data as
-        | { friendsRequest: User[]; sentFriendRequest: User[] }
+        | {
+            friendsRequest: MeaningfulUserFields[]
+            sentFriendRequest: MeaningfulUserFields[]
+          }
         | undefined
       if (requests) {
         setIncomingRequests(requests.friendsRequest)
@@ -33,6 +39,37 @@ export default function Requests() {
     }
     fetchRequests()
   }, [currentId, setIncomingRequests, setSentRequests])
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe(`friend-requests-${currentId}`)
+    console.log('currentId', currentId)
+    const newRequestHandler = (data: MeaningfulUserFields) => {
+      addToIncomingRequests(data)
+    }
+    const sentRequestRejectedHandler = (data: MeaningfulUserFields) => {
+      console.log(data, sentRequests)
+      setSentRequests(
+        sentRequests?.filter((sentReq) => sentReq.id !== data.id) || []
+      )
+    }
+
+    const sentRequestAcceptedHandler = (data: MeaningfulUserFields) => {
+      setSentRequests(
+        sentRequests?.filter((sentReq) => sentReq.id !== data.id) || []
+      )
+    }
+
+    channel.bind('new-request', newRequestHandler)
+    channel.bind('sent-request-rejected', sentRequestRejectedHandler)
+    channel.bind('sent-request-accepted', sentRequestAcceptedHandler)
+
+    return () => {
+      channel.unbind('new-request', newRequestHandler)
+      channel.unbind('sent-request-rejected', sentRequestRejectedHandler)
+      channel.unbind('sent-request-accepted', sentRequestAcceptedHandler)
+      pusherClient.unsubscribe(`friend-requests-${currentId}`)
+    }
+  })
 
   const popSentRequest = useCallback(
     (userId: string) => {

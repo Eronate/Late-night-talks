@@ -48,13 +48,18 @@ export default function SettingsModal({
   const image = watch('image')
 
   const handleUpload = (result: any) => {
-    setValue('image', result?.info?.secure_url, {
-      shouldValidate: true,
-    })
+    try {
+      setValue('image', result?.info?.secure_url, {
+        shouldValidate: true,
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     try {
+      console.log('Data from settings', data)
       const fetchData = async () => {
         if (!session.data?.user.id) return
         const response = await axios.post('/api/settings', {
@@ -81,7 +86,6 @@ export default function SettingsModal({
   }
 
   if (!session.data) return <></>
-  console.log('session data modal', session.data)
   return (
     <Dialog
       open={isOpen}
@@ -107,7 +111,6 @@ export default function SettingsModal({
                 options={{ minLength: 3, maxLength: 20 }}
                 label="username"
                 register={register}
-                required={true}
                 placeholder="Enter your username"
               />
             </div>

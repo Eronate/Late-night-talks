@@ -9,13 +9,14 @@ import toast from 'react-hot-toast'
 import { IoClose } from 'react-icons/io5'
 import { TiTick } from 'react-icons/ti'
 import Avatar from './Avatar'
+import { MeaningfulUserFields } from '@/app/types'
 
 export default function FriendRequestBox({
   user,
   variant,
   popFromState,
 }: {
-  user: User
+  user: MeaningfulUserFields
   variant: 'incoming' | 'sent'
   popFromState: (userId: string) => void
 }) {
@@ -91,7 +92,7 @@ export default function FriendRequestBox({
 
   return (
     <div className={style}>
-      <Avatar img={user.image} />
+      <Avatar img={user.image} userEmail={user.email!} />
 
       <div className="flex ml-2 flex-row justify-start min-w-0 text-ellipsis whitespace-nowrap w-full">
         <div className="text-md text-slate-400">{user.username}</div>
