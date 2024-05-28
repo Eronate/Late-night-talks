@@ -6,14 +6,15 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { EventHandler, MouseEvent } from 'react'
 import Avatar from './Avatar'
+import { MeaningfulUserFields } from '@/app/types'
 
-export default function UserBox({ user }: { user: User }) {
+export default function UserBox({ user }: { user: MeaningfulUserFields }) {
   const router = useRouter()
   const session = useSession()
 
   const handleClick = async (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-    user: User
+    user: MeaningfulUserFields
   ) => {
     if (!session.data) return null
     const response = await axios.post('/api/conversations/', {

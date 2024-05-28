@@ -1,5 +1,4 @@
 import { ZodError } from "zod";
-import { requestBodySchema } from "../add/route";
 import { NextResponse } from "next/server";
 import prismadb from "@/app/libs/prismadb";
 import RemoveBothRequests from "../utils/removeBothRequests";

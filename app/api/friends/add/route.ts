@@ -1,13 +1,9 @@
 import prisma from "@/app/libs/prismadb"
 import { pusherServer } from "@/app/libs/pusher";
 import { getMeaningfulUserFields } from "@/app/types";
+import { requestBodySchema } from "@/lib/requestType";
 import { NextResponse } from "next/server";
 import * as z from 'zod'
-
-export const requestBodySchema = z.object({
-  sender: z.string(),
-  receiver: z.string(),
-});
 
 export async function POST(req: Request) {
     const body = await req.json()

@@ -1,5 +1,5 @@
 import { prismadb } from "@/app/libs/prismadb"
-import { requestBodySchema } from "../add/route"
+import { requestBodySchema } from "@/lib/requestType"
 import { NextResponse } from "next/server"
 
 export default async function RemoveBothRequests(req: Request) {

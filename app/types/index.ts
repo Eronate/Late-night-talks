@@ -7,7 +7,8 @@ export type MeaningfulUserFields =
     "email" | 
     "image" | 
     "createdAt" | 
-    "updatedAt">
+    "updatedAt" |
+    "status">
 
 export type FullMessageType = Message & {
     sender: MeaningfulUserFields,
@@ -26,6 +27,7 @@ export const getMeaningfulUserFields = (user: User): MeaningfulUserFields => {
         email: user.email,
         image: user.image,
         createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        updatedAt: user.updatedAt,
+        status: user.status
     }
 }
