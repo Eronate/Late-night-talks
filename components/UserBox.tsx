@@ -38,9 +38,9 @@ export default function UserBox({ user }: { user: MeaningfulUserFields }) {
           <div className="text-sm text-slate-400 max-w-[70%] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
             {user.status}
           </div>
-          <div className="flex ml-auto self-end text-sm text-slate-500">
+          {/* <div className="flex ml-auto self-end text-sm text-slate-500">
             7:00 PM
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

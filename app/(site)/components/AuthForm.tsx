@@ -143,6 +143,7 @@ export default function AuthForm() {
             key="password"
             errors={errors['password'] as FieldError}
             disabled={isLoading}
+            type="password"
             label="password"
             register={register}
             required={true}
